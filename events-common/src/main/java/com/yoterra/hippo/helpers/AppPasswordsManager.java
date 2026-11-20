@@ -254,13 +254,6 @@ public class AppPasswordsManager implements Closeable{
 		}
 	}
 	
-	public static void main(String[] args) throws IOException {
-		try(AppPasswordsManager apm = new AppPasswordsManager("/home/mihajlo/pass1.bin", "pass1", "pass2", "pass3")){
-			Map<String, String> passwords = apm.getPasswords();
-			System.out.println(passwords);
-		};
-	}
-
 	@Override
 	public void close() throws IOException {
 		if(scanner != null) {
