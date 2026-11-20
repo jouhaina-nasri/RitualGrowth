@@ -1,0 +1,65 @@
+version: "3" # specify docker-compose version
+
+# Define the services/containers to be run
+services:
+
+  spring: #name of the first service
+    image: spring-app
+    container_name: spring-container
+    build: events-rg # specify the directory of the Dockerfile
+    ports:
+      - "8080:8080" #specify ports forewarding
+    links:
+      - postgres
+      - redis
+      - influx
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/events
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=docker
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - app
+
+  postgres: # name of the second service
+    image: postgres # specify image to build container from
+    ports:
+      - "5432:5432" # specify port forewarding
+    environment:
+      - POSTGRES_DB=events
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=docker
+    networks:
+      - app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis: # name of the third service
+    image: redis # specify image to build container from
+    ports:
+      - "6379:6379" # specify port forewarding
+    networks:
+     - app
+
+
+  influx: # name of the fourth service
+    image: influxdb
+    environment:
+      INFLUXDB_DB: events
+      INFLUXDB_ADMIN_USER: admin
+      INFLUXDB_ADMIN_PASSWORD: admin
+      INFLUXDB_ADMIN_ENABLED: "true"
+      INFLUXDB_HTTP_AUTH_ENABLED: "true"
+    volumes:
+      - ./volumes/influxdb-volume:/var/lib/influxdb
+    ports:
+      - "8086:8086"
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge
+volumes:
+  pgdata:
+
