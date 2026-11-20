@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
 
-import com.yoterra.commons.DigestUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 
 public class CSApiTokenManager {
 	

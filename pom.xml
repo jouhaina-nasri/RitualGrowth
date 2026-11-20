@@ -20,7 +20,6 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<com.yoterra.dpp-core.version>0.4.0</com.yoterra.dpp-core.version>
 		<log4j.version>2.17.0</log4j.version>
 	</properties>
 	
@@ -43,9 +42,15 @@
 			</dependency>
 
 			<dependency>
-				<groupId>com.groupangle</groupId>
-				<artifactId>dp-core-data</artifactId>
-				<version>${com.yoterra.dpp-core.version}</version>
+				<groupId>commons-validator</groupId>
+				<artifactId>commons-validator</artifactId>
+				<version>1.7</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>31.1-jre</version>
 			</dependency>
 
 			<dependency>

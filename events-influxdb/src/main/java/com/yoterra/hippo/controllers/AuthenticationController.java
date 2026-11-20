@@ -10,7 +10,7 @@ import com.yoterra.hippo.jpa.entities.users.User;
 import com.yoterra.hippo.req.Form;
 import com.yoterra.hippo.security.ActiveUser;
 import com.yoterra.hippo.security.model.AuthToken;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

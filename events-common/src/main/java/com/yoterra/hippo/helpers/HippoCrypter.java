@@ -6,7 +6,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.yoterra.commons.DigestUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 
 public class HippoCrypter {
 	

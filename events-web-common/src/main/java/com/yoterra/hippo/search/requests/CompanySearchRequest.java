@@ -5,9 +5,6 @@ import java.util.Map;
 import com.yoterra.hippo.search.requests.sort.CompanySort;
 import org.springdoc.api.annotations.ParameterObject;
 
-//import com.google.common.collect.ImmutableMap;
-import com.yoterra.data.records.DataLocalityUtils;
-//import com.yoterra.data.repos.query.CompanyRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
@@ -16,7 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 
 public class CompanySearchRequest extends SortSearchRequest<CompanySort>{
 
-	private static final String US_LOCALITY = DataLocalityUtils.DEFAULT_LOCALITY;
+	private static final String US_LOCALITY = "us";
 
 	@Parameter(required = false, description = "Filter by user Id")
 	private Long OwnerId;
