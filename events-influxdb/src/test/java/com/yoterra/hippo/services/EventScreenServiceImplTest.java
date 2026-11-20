@@ -2,7 +2,6 @@ package com.yoterra.hippo.services;
 
 import com.yoterra.hippo.exception.InvalidEventArguments;
 import com.yoterra.hippo.mapper.EventScreenMapper;
-import com.yoterra.hippo.mapper.EventScreenMapperTest;
 import com.yoterra.hippo.measurements.entities.EventScreenMeasurement;
 import com.yoterra.hippo.measurements.load.EventScreenEntity;
 import com.yoterra.hippo.measurements.repository.EventScreenRepositoryImpl;
@@ -15,6 +14,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.yoterra.hippo.services.HashService.hash;
+import static com.yoterra.hippo.testdata.ScreenEvents.sampleEvent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -39,7 +39,7 @@ class EventScreenServiceImplTest {
 
     @Test
     void savesMeasurementWithHashedProjectCohortAndUserIds() throws Exception {
-        EventScreenEntity event = EventScreenMapperTest.sampleEvent();
+        EventScreenEntity event = sampleEvent();
 
         service.saveScreenEvent(event);
 
@@ -52,7 +52,7 @@ class EventScreenServiceImplTest {
 
     @Test
     void assignsANewEventId() throws Exception {
-        EventScreenEntity event = EventScreenMapperTest.sampleEvent();
+        EventScreenEntity event = sampleEvent();
         event.setEventId(null);
 
         service.saveScreenEvent(event);
@@ -62,7 +62,7 @@ class EventScreenServiceImplTest {
 
     @Test
     void rejectsEventWithoutDeviceInformation() {
-        EventScreenEntity event = EventScreenMapperTest.sampleEvent();
+        EventScreenEntity event = sampleEvent();
         event.setDeviceInformation(null);
 
         assertThrows(InvalidEventArguments.class, () -> service.saveScreenEvent(event));
@@ -75,6 +75,6 @@ class EventScreenServiceImplTest {
                 .when(repository).save(any(), anyLong(), anyLong(), anyLong());
 
         assertThrows(InvalidEventArguments.class,
-                () -> service.saveScreenEvent(EventScreenMapperTest.sampleEvent()));
+                () -> service.saveScreenEvent(sampleEvent()));
     }
 }
