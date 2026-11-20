@@ -44,7 +44,7 @@ public class EventScreenRepositoryImpl implements EventScreenRepository<EventScr
                 .tag("projectId", screen.getProjectId())
                 .tag("previousScreenName", screen.getPreviousScreenName())
                 .tag("screenName", screen.getScreenName())
-                .tag("screenSubtype", screen.getScreenType())
+                .tag("screenSubtype", screen.getScreenSubtype())
                 .tag("screenType", screen.getScreenType())
 
                 //

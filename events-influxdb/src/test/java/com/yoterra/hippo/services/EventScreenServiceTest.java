@@ -9,6 +9,7 @@ import com.yoterra.hippo.measurements.load.NavigationParams;
 import com.yoterra.hippo.measurements.load.ScreenInformation;
 import com.yoterra.hippo.measurements.repository.EventScreenRepository;
 import com.yoterra.hippo.measurements.requests.form.EventRequest;
+import org.influxdb.InfluxDB;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.jupiter.api.Tag;
@@ -28,6 +29,10 @@ public class EventScreenServiceTest {
 
     @Autowired
     EventScreenService eventScreenService;
+
+    /** Writes are batched (see InfluxDbConfig); flush so they are visible to the next query. */
+    @Autowired
+    InfluxDB influxDB;
     EventScreenMeasurement screen = new EventScreenMeasurement();
 
 
@@ -38,6 +43,7 @@ public class EventScreenServiceTest {
                 "LIST","COLLECTIONS","DEAL","8gmn5vIK6ADGlrE73idx6Q",1665146095463L,1665146099087L,1665146095463L,3624,
                 "C87E697A-032E-4570-A239-8B3952848A951665055688669","C87E697A-032E-4570-A239-8B3952848A95");
          eventScreenRepository.save(screen,1L,1L,1L);
+         influxDB.flush();
     }
 
     @Test
@@ -54,6 +60,7 @@ public class EventScreenServiceTest {
                 3624, "C87E697A-032E-4570-A239-8B3952848A951665055688669",
                 "C87E697A-032E-45");
         eventScreenService.saveScreenEvent(eventScreen);
+        influxDB.flush();
         assertFalse(eventScreenService.findAllDeviceEntity(eventScreen.getUserId()).isEmpty());
     }
 
