@@ -14,7 +14,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '8'
-          cache: maven
       - name: Build and run unit tests
         run: mvn -B verify 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
       - name: Report build errors
@@ -59,7 +58,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '8'
-          cache: maven
       - name: Create a throwaway Firebase service-account key
         run: |
           openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out ci-key.pem
