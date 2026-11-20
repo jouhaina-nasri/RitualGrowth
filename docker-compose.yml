@@ -1,65 +1,73 @@
-version: "3" # specify docker-compose version
+# Local stack: PostgreSQL, Redis, InfluxDB 1.8 and both services.
+#   mvn -B package -DskipTests
+#   docker compose up --build
+# Both services need a Firebase Admin SDK key at ./secrets/firebase-adminsdk.json (not committed).
 
-# Define the services/containers to be run
 services:
-
-  spring: #name of the first service
-    image: spring-app
-    container_name: spring-container
-    build: events-rg # specify the directory of the Dockerfile
+  events-influxdb:
+    build: ./events-influxdb
     ports:
-      - "8080:8080" #specify ports forewarding
-    links:
+      - "8084:8084"
+    depends_on:
       - postgres
       - redis
-      - influx
+      - influxdb
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/events
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=docker
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-    networks:
-      - app
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/events
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_REDIS_HOST: redis
+      SPRING_INFLUX_URL: http://influxdb:8086
+      SPRING_INFLUX_PASSWORD: ${INFLUX_PASSWORD:-admin}
+      FIREBASE_CONFIG_FILE: /run/secrets/firebase-adminsdk.json
+    volumes:
+      - ./secrets:/run/secrets:ro
 
-  postgres: # name of the second service
-    image: postgres # specify image to build container from
+  events-rest-rg:
+    build: ./events-rest-rg
     ports:
-      - "5432:5432" # specify port forewarding
+      - "8085:8085"
+    depends_on:
+      - influxdb
     environment:
-      - POSTGRES_DB=events
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=docker
-    networks:
-      - app
+      SPRING_INFLUX_URL: http://influxdb:8086
+      SPRING_INFLUX_PASSWORD: ${INFLUX_PASSWORD:-admin}
+      DATA_DIR: /data
+      FIREBASE_CONFIG_FILE: /run/secrets/firebase-adminsdk.json
+    volumes:
+      - ./secrets:/run/secrets:ro
+      - rg-data:/data
+
+  postgres:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: events
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  redis: # name of the third service
-    image: redis # specify image to build container from
+  redis:
+    image: redis:7
     ports:
-      - "6379:6379" # specify port forewarding
-    networks:
-     - app
+      - "6379:6379"
 
-
-  influx: # name of the fourth service
-    image: influxdb
+  influxdb:
+    # The services use the InfluxDB 1.x API (influxdb-java)
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
     environment:
       INFLUXDB_DB: events
       INFLUXDB_ADMIN_USER: admin
-      INFLUXDB_ADMIN_PASSWORD: admin
-      INFLUXDB_ADMIN_ENABLED: "true"
+      INFLUXDB_ADMIN_PASSWORD: ${INFLUX_PASSWORD:-admin}
       INFLUXDB_HTTP_AUTH_ENABLED: "true"
     volumes:
-      - ./volumes/influxdb-volume:/var/lib/influxdb
-    ports:
-      - "8086:8086"
-    networks:
-      - app
+      - influxdata:/var/lib/influxdb
 
-networks:
-  app:
-    driver: bridge
 volumes:
   pgdata:
-
+  influxdata:
+  rg-data:
