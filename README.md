@@ -90,8 +90,8 @@ Choose a profile with `-Dspring.profiles.active=<profile>`. No secrets are store
 
 Tests use JUnit 5, Mockito and AssertJ, and run on every push with GitHub Actions.
 
-- **Unit tests** need no external services and run with `mvn test`. They cover the screen-event mapping and screen-time fields, the event service (hashing of project/cohort/user ids, validation and error handling), the Redis index service, ID hashing and the shared null-safe utilities.
-- **Integration tests** (`@Tag("integration")`, `@SpringBootTest`) need PostgreSQL, Redis and InfluxDB running and are skipped by default:
+- **Unit tests** need no external services and run with `mvn test`. They cover the screen-event mapping and screen-time fields, the InfluxDB write format (tags vs fields), the event service (hashing of project/cohort/user ids, validation and error handling), the Redis index service, ID hashing and the shared null-safe utilities.
+- **Integration tests** (`@Tag("integration")`, `@SpringBootTest`) need PostgreSQL, Redis and InfluxDB. CI runs them against real service containers; locally they are skipped by default:
   ```bash
   docker compose up -d postgres redis influxdb
   mvn verify -Pintegration-tests

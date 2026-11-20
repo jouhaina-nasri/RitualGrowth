@@ -16,6 +16,16 @@ jobs:
           java-version: '8'
       - name: Build and run unit tests
         run: mvn -B verify 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
+      - name: Build Docker images
+        run: |
+          docker build -q -t events-influxdb ./events-influxdb
+          docker build -q -t events-rest-rg ./events-rest-rg
+          docker compose config -q
+      - name: Test summary
+        if: always()
+        run: |
+          echo "### Test results" >> "$GITHUB_STEP_SUMMARY"
+          grep -E '^\[(INFO|ERROR|WARNING)\] Tests run:.* - in ' build.log | sed -E 's/^\[[A-Z]+\] //; s/, Time elapsed:[^-]*//' | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY" || true
       - name: Report build errors
         if: failure()
         run: |
@@ -64,6 +74,11 @@ jobs:
           python3 -c "import json; print(json.dumps({'type':'service_account','project_id':'ci-test','private_key_id':'ci','private_key':open('ci-key.pem').read(),'client_email':'ci@ci-test.iam.gserviceaccount.com','client_id':'1','token_uri':'https://oauth2.googleapis.com/token'}))" > ci-firebase.json
       - name: Run integration tests
         run: mvn -B verify -Pintegration-tests -pl events-influxdb -am 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
+      - name: Test summary
+        if: always()
+        run: |
+          echo "### Test results" >> "$GITHUB_STEP_SUMMARY"
+          grep -E '^\[(INFO|ERROR|WARNING)\] Tests run:.* - in ' build.log | sed -E 's/^\[[A-Z]+\] //; s/, Time elapsed:[^-]*//' | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY" || true
       - name: Report test failures
         if: failure()
         run: |
