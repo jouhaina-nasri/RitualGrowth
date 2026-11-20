@@ -35,7 +35,7 @@ class ActiveUserServiceTest {
         Set<UserStatus> userStatuses = new HashSet<>();
         userStatuses.add(EXPIRED);
         Set<Privilege> privileges = new HashSet<>();
-        user = new User("554789921089", "testing@yoterra.com", "User Testing", null, userStatuses, privileges, "testtoken:testing@yoterra.com", false);
+        user = new User("554789921089", "testing@example.com", "User Testing", null, userStatuses, privileges, "testtoken:testing@example.com", false);
         userRepository.save(user);
     }
 
@@ -46,7 +46,7 @@ class ActiveUserServiceTest {
 
     @Test
     void emailCheckNotExisting() {
-        assertFalse(activeUserService.emailCheck("user@yoterra.com"));
+        assertFalse(activeUserService.emailCheck("user@example.com"));
     }
 
 
