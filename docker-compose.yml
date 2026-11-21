@@ -1,0 +1,73 @@
+# Local stack: PostgreSQL, Redis, InfluxDB 1.8 and both services.
+#   mvn -B package -DskipTests
+#   docker compose up --build
+# Both services need a Firebase Admin SDK key at ./secrets/firebase-adminsdk.json (not committed).
+
+services:
+  events-influxdb:
+    build: ./events-influxdb
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres
+      - redis
+      - influxdb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/events
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SPRING_REDIS_HOST: redis
+      SPRING_INFLUX_URL: http://influxdb:8086
+      SPRING_INFLUX_PASSWORD: ${INFLUX_PASSWORD:-admin}
+      FIREBASE_CONFIG_FILE: /run/secrets/firebase-adminsdk.json
+    volumes:
+      - ./secrets:/run/secrets:ro
+
+  events-rest-rg:
+    build: ./events-rest-rg
+    ports:
+      - "8085:8085"
+    depends_on:
+      - influxdb
+    environment:
+      SPRING_INFLUX_URL: http://influxdb:8086
+      SPRING_INFLUX_PASSWORD: ${INFLUX_PASSWORD:-admin}
+      DATA_DIR: /data
+      FIREBASE_CONFIG_FILE: /run/secrets/firebase-adminsdk.json
+    volumes:
+      - ./secrets:/run/secrets:ro
+      - rg-data:/data
+
+  postgres:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: events
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  influxdb:
+    # The services use the InfluxDB 1.x API (influxdb-java)
+    image: influxdb:1.8
+    ports:
+      - "8086:8086"
+    environment:
+      INFLUXDB_DB: events
+      INFLUXDB_ADMIN_USER: admin
+      INFLUXDB_ADMIN_PASSWORD: ${INFLUX_PASSWORD:-admin}
+      INFLUXDB_HTTP_AUTH_ENABLED: "true"
+    volumes:
+      - influxdata:/var/lib/influxdb
+
+volumes:
+  pgdata:
+  influxdata:
+  rg-data:
